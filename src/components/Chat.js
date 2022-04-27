@@ -3,8 +3,6 @@ import React, {useEffect, useState} from 'react';
 function Chat(props) {
     const [message, setMessage] = useState('');
 
-    
-
     return (
         <div>
             <div className=" bg-yellow-300 ">
