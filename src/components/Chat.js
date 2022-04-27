@@ -1,21 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { db } from "../firebase";
 import { useSearchParams } from 'react-router-dom';
-import { collection, getDocs, deleteDoc, doc, onSnapshot, getDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, onSnapshot, getDoc, query, where,addDoc } from 'firebase/firestore';
 function Chat(props) {
     const [message, setMessage] = useState('');
     const [searchParams] = useSearchParams();
-    const [user, setUser] = useState([]);
+    const [dataMessage, setDataMessage] = useState([]);
+    const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")));
+    const [userEmail, setUserEmail] = useState(searchParams.get('email'));
+    const [userId, setUserId] = useState(searchParams.get('id'));
+    let unSub = null;
+
+    const postMessage = async (e) => {
+        e.preventDefault();
+        if(!message){
+            alert("ghi rồi mới submit bạn êiiii");
+            return;
+        }
+        const collectionRef = collection(db, 'chat');
+        await addDoc(collectionRef,{
+            message:message,uid:user.uid,date:Date.now(),userUid:[user.uid,userId]
+        });
+        setMessage('');
+    }
 
     useEffect(() => {
-        (
-            async () => {
-                const docRef = doc(db, 'users', searchParams.get('id'));
-                const docSnapshot = await getDoc(docRef);
-                setMessage(docSnapshot.data());
-            }
-        )();
+        (async ()=>{
+            const collectionRef = collection(db,'chat');
+            const collectionQuery = query(collectionRef, where('userUid','in', [[userId,user.uid],[user.uid,userId]]));
+            unSub = onSnapshot(collectionQuery,(snapShot) => {
+                const localMessage = [];
+                snapShot.forEach(doc =>{
+                    localMessage.push({
+                        id:doc.id,
+                        message:doc.data().message,
+                        uid:doc.data().uid,
+                        date:doc.data().date});
+                });
+                setDataMessage(localMessage);
+            });
+        })();
+        
     }, []);
+
+    const DeleteNote = async (id)=>{
+        const docRef = doc(db,'chat',id);
+        await deleteDoc(docRef)
+    }
     return (
         <div>
             <div className=" bg-yellow-300 ">
@@ -35,7 +66,7 @@ function Chat(props) {
                                 </div>
                                 <div className="flex flex-col leading-tight">
                                     <div className="text-2xl mt-1 flex items-center">
-                                        <span className="text-gray-700 mr-3">Anderson Vanhron</span>
+                                        <span className="text-gray-700 mr-3">{userEmail}</span>
                                     </div>
                                     <span className="text-lg text-gray-600">Junior Developer</span>
                                 </div>
@@ -69,8 +100,8 @@ function Chat(props) {
                         </div>
                         <div id="messages"
                             className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
-                            {/* {
-                                dataMessage.map((messageItem,messageIndex)=>{
+                            {
+                                dataMessage?.map((messageItem,messageIndex)=>{
                                     return (
                                         <div>
                                             <div className="chat-message">
@@ -88,7 +119,7 @@ function Chat(props) {
                                         </div>
                                     )
                                 })
-                            } */}
+                            }
 
 
                         </div>

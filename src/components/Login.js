@@ -37,8 +37,9 @@ const Login = () => {
                 const resp = await signInWithEmailAndPassword(auth, email, password);
                 console.log(resp.user);
                 alert('Login success')
+                sessionStorage.setItem('user',JSON.stringify(resp.user));
                 localStorage.setItem('user', JSON.stringify(resp.user));
-                navigate('/')
+                navigate('/home')
             } catch (e) {
                 alert("Ko đăng nhập đc bạn ei, non")
                 console.error(e);
