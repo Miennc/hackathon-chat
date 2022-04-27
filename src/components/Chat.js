@@ -8,12 +8,13 @@ function Chat(props) {
     const [user, setUser] = useState([]);
 
     useEffect(() => {
-        (async () => {
-            const docRef = doc(db, 'users', searchParams.get('id'));
-            const docSnapshot = await getDoc(docRef);
-            setUser(docSnapshot.data());
-            console.log(user)
-        })();
+        (
+            async () => {
+                const docRef = doc(db, 'users', searchParams.get('id'));
+                const docSnapshot = await getDoc(docRef);
+                setMessage(docSnapshot.data());
+            }
+        )();
     }, []);
     return (
         <div>
