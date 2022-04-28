@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { db } from "../firebase";
 import { useSearchParams } from 'react-router-dom';
 import {getStorage, uploadBytes, ref, getDownloadURL} from "firebase/storage";
-import { collection, getDocs, deleteDoc, doc, onSnapshot, getDoc, query, where, addDoc, orderBy, limit,} from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, onSnapshot, getDoc, query, where, addDoc,orderBy, limit,} from 'firebase/firestore';
 function Chat(props) {
     const [message, setMessage] = useState('');
     const [searchParams] = useSearchParams();
@@ -16,6 +16,7 @@ function Chat(props) {
     let unSub = null;
 
     const postMessage = async (e) => {
+
         e.preventDefault();
         const storage = getStorage();//base storage //unix
         if (!message) {
@@ -41,19 +42,16 @@ function Chat(props) {
         }
         const collectionRef = collection(db, 'chat');
         await addDoc(collectionRef, {
-            message: message, uid: user.uid, date: Date.now(), userUid: [user.uid, userId],urls:urls
+            message: message, uid: user.uid, date: new Date(), userUid: [user.uid, userId],urls:urls
         });    
         setMessage('');
-        setSelectedImage([]);
-        setFile_name([]);
     }
 
     useEffect(() => {
 
         (async () => {
             const collectionRef = collection(db, 'chat');
-             const collectionQuery = query(collectionRef, where('userUid', 'in', [[userId, user.uid], [user.uid, userId]]));
-                    
+            const collectionQuery = query(collectionRef, where('userUid', 'in', [[userId, user.uid], [user.uid, userId]]),limit(7));
             unSub = onSnapshot(collectionQuery, (snapShot) => {
                 const localMessage = [];
                 snapShot.forEach(doc => {
@@ -111,7 +109,7 @@ function Chat(props) {
     // }
     return (
         <div>
-            <div className=" bg-yellow-300 ">
+            <div className=" bg-green-300">
                 <div className="w-10/12 bg-white mx-auto">
                     <div className="flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen">
                         <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
@@ -138,7 +136,7 @@ function Chat(props) {
                                     className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor" className="h-6 w-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
                                 </button>
@@ -163,7 +161,7 @@ function Chat(props) {
                         <div id="messages"
                             className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
                             {
-                                dataMessage?.map((messageItem, messageIndex) => {
+                                dataMessage?.sort((a,b)=>a.date - b.date)?.map((messageItem, messageIndex) => {
                                     return (
                                         <div>
                                             <div className="chat-message">
@@ -177,7 +175,11 @@ function Chat(props) {
                                                         })
                                                     }
                                                         <div><span
-                                                            className={user.uid === messageItem.uid ? "px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white  text-xl" : "px-4 py-2 rounded-lg inline-block rounded-br-none bg-pink-600 text-white "}>{messageItem.message}</span>
+                                                            className={user.uid === messageItem.uid ? "px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white  text-xl" : "px-4 py-2 rounded-lg inline-block rounded-br-none bg-pink-600 text-white text-xl"}>{messageItem.message} </span>
+                                                     
+                                                        </div>
+                                                        <div>{messageItem.idIncrement}</div>
+                                                        <div>
                                                         </div>
                                                     </div>
                                                     <img
@@ -199,7 +201,8 @@ function Chat(props) {
                                 </div>
                             )}
                          </div>
-                        <label for="fileImg" className=" cursor-pointer">
+                      <div className="flex items-center">
+                      <label for="fileImg" className=" cursor-pointer mx-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor" className="h-6 w-6 text-gray-600">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -212,12 +215,14 @@ function Chat(props) {
                             />
                         </label>
                          <input type="text" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Aa"  className="border-2 border-green-400 w-96 p-2"/>
+                      </div>
                      </form>
                 </div>
             </div>
         </div>
         </div >
     );
+
 }
 
 export default Chat;

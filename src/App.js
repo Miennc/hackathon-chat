@@ -14,10 +14,10 @@ export default function App() {
     <div>
       <BrowserRouter>
         <Routes>
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/chat" element={<Chat />} />
           <Route path="/signup" element={<Signup />} ></Route>
-          <Route path="/" element={<Login />} ></Route>
+          <Route path="/login" element={<Login />} ></Route>
         </Routes>
         {/* <Link to={`/about?name=mien&age=20`}>about</Link> */}
       </BrowserRouter>
