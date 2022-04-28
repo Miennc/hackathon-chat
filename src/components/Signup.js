@@ -28,6 +28,7 @@ const Signup = () => {
                 await addDoc(collectionRef, {
                     email: response.user.email,
                     userId: response.user.uid,
+                    isOnline: false,
                  });
                 alert('Register success')
             } catch (error) {

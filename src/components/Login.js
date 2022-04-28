@@ -1,26 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from "../firebase";
+import { auth,db } from "../firebase";
+import {onSnapshot, doc, collection,updateDoc,getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [users, setUser] = useState([])
     // const [error, setError] = useState('')
     let navigate = useNavigate();
-    // const validate = () => {
-    //     if (!email) {
-    //         alert('Email is required')
-    //         return;
-    //     } else if (!/\S+@\S+\.\S+/.test(email)) {
-    //         alert('Email is invalid')
-    //         return;
-    //     } else if (!password) {
-    //         alert('Password is required')
-    //         return;
-    //     }
-    // }
+        
+
     const _doLogin = async (evt) => {
         evt.preventDefault();
         if (!email) {
@@ -36,6 +28,13 @@ const Login = () => {
             try {
                 const resp = await signInWithEmailAndPassword(auth, email, password);
                 console.log(resp.user);
+                const userRef = doc(db, `users/${resp.user.uid}`);
+                console.log("oc",userRef);
+                setDoc(userRef, {
+                    id: resp.user.uid,
+                    email: resp.user.email,
+                    isOnline: true
+                })
                 alert('Login success')
                 sessionStorage.setItem('user',JSON.stringify(resp.user));
                 localStorage.setItem('user', JSON.stringify(resp.user));
