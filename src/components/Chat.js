@@ -12,7 +12,9 @@ function Chat(props) {
     const [userId, setUserId] = useState(searchParams.get('id'));
     const [selectedImages, setSelectedImage] = useState([]);
     const [file_name, setFile_name] = useState([]);
-    const [files,setFiles] = useState([])
+    const [files,setFiles] = useState([]);
+    const [showModal,setShowModal] = useState(false);
+    const [previewImage,setPreviewImage] = useState('')
     let unSub = null;
 
     const postMessage = async (e) => {
@@ -67,7 +69,7 @@ function Chat(props) {
                 });
                 setDataMessage(localMessage);
             });
-        })();
+})();
 
     }, []);
 
@@ -87,7 +89,7 @@ function Chat(props) {
         return source.map((photo, index) => {
             return (<div className="w-40 h-40 relative" key={index}>
                 <img className="w-40 h-40 object-cover shadow" type="img" src={photo} key={photo} />
-                <i className="w-6 h-6 absolute z-10 top-2 left-32 rounded-full text-center flex items-center justify-center cursor-pointer opacity-30 hover:opacity-100 hover:bg-gray-200 bg-gray-300 text-2xl" onClick={removeSelectedImage.bind(this, index)}><ion-icon name="close-outline"></ion-icon></i>
+                <i className="w-6 h-6 absolute z-10 top-2 left-32 rounded-full text-center flex items-center justify-center cursor-pointer opacity-30 hover:opacity-100 hover:bg-gray-200 bg-gray-300 text-2xl" onClick={removeSelectedImage.bind(this, index)}>x<ion-icon name="close-outline"></ion-icon></i>
             </div>)
         })
     };
@@ -102,7 +104,8 @@ function Chat(props) {
     };
 
     const prevImage = (img) =>{
-        console.log(img);
+        setPreviewImage(img);
+        setShowModal(true);
     }
 
     // const DeleteNote = async (id) => {
@@ -128,7 +131,7 @@ function Chat(props) {
                                 </div>
                                 <div className="flex flex-col leading-tight">
                                     <div className="text-2xl mt-1 flex items-center">
-                                        <span className="text-gray-700 mr-3">{userEmail}</span>
+<span className="text-gray-700 mr-3">{userEmail}</span>
                                     </div>
                                     <span className="text-lg text-gray-600">Junior Developer</span>
                                 </div>
@@ -160,6 +163,12 @@ function Chat(props) {
                                 </button>
                             </div>
                         </div>
+                        <div className={showModal ? "relative w-100vw h-100vh bg-gray-500" : "hidden"}>
+<div className="w-100vw top-0 left-0 ">
+                                <img className="w-auto object-cover mx-auto" src={previewImage} alt=""  />
+                                <span className="absolute right-3 top-0 text-2xl cursor-pointer" onClick={()=>{setShowModal(!showModal)}}>x</span>
+                            </div>
+                        </div>
                         <div id="messages"
                             className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
                             {
@@ -186,7 +195,7 @@ function Chat(props) {
                                                     </div>
                                                     <img
                                                         src={user.uid === messageItem.uid ? "https://taimienphi.vn/tmp/cf/aut/anh-gai-xinh-1.jpg" : "https://tophinhanh.com/wp-content/uploads/2021/12/hinh-anh-gai-xinh-nhat-the-gioi.jpg"}
-                                                        alt="My profile" className={user.uid === messageItem.uid ? "w-6 h-6 rounded-full order-2 object-cover" : "w-6 h-6 rounded-full order-1 object-cover"} />
+alt="My profile" className={user.uid === messageItem.uid ? "w-6 h-6 rounded-full order-2 object-cover" : "w-6 h-6 rounded-full order-1 object-cover"} />
                                                 </div>
                                             </div>
                                         </div>
