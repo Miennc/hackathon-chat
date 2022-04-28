@@ -114,7 +114,7 @@ function Chat(props) {
     // }
     return (
         <div>
-            <div className=" bg-green-300">
+            <div className=" bg-slate-200">
                 <div className="w-10/12 bg-white mx-auto">
                     <div className="flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen">
                         <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
@@ -225,7 +225,7 @@ alt="My profile" className={user.uid === messageItem.uid ? "w-6 h-6 rounded-full
                                     className="inline-flex hidden items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
                             />
                         </label>
-                         <input type="text" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Aa"  className="border-2 border-green-400 w-96 p-2"/>
+                         <input type="text" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Aa"  className="border-2 border-green-400 w-96 p-2 rounded"/>
                       </div>
                      </form>
                 </div>
