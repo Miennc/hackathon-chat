@@ -46,18 +46,22 @@ function Chat(props) {
 
         
         const urlAudio = []
-        try {
-            const fileName = `audios/${Date.now()}audio.mp4`;
-            const myRef = ref(storage, fileName);//tao ref
-            await uploadBytes(myRef, audio, fileName);
-            //lưu lại file vào firestore
-            const pathRef = ref(storage, fileName);
-            const url = await getDownloadURL(pathRef);
-            urlAudio.push(url);
-        } catch (e) {
-            alert("lỗi")
+        if(audio){
+            try {
+                const fileName = `audios/${Date.now()}audio.mp4`;
+                const myRef = ref(storage, fileName);//tao ref
+                await uploadBytes(myRef, audio, fileName);
+                //lưu lại file vào firestore
+                const pathRef = ref(storage, fileName);
+                const url = await getDownloadURL(pathRef);
+                urlAudio.push(url);
+            } catch (e) {
+                alert("lỗi")
+            }
+        }else{
+            urlAudio.push('fail')
         }
-
+        console.log(urlAudio[0]);
         const collectionRef = collection(db, 'chat');
         await addDoc(collectionRef, {
             message: message, 
@@ -69,6 +73,7 @@ function Chat(props) {
         });
         document.getElementById('messages').scrollTo(0, 1000000);
         setMessage('');
+        setAudio(null)
         setFile_name([]);
         setSelectedImage([]);
     }
@@ -159,7 +164,7 @@ function Chat(props) {
                                 </div>
                                 <div className="flex flex-col leading-tight">
                                     <div className="text-2xl mt-1 flex items-center">
-<span className="text-gray-700 mr-3">{userEmail}</span>
+                                    <span className="text-gray-700 mr-3">{userEmail}</span>
                                     </div>
                                     <span className="text-lg text-gray-600">Junior Developer</span>
                                 </div>
@@ -213,14 +218,18 @@ function Chat(props) {
                                                             )
                                                         })
                                                     }
-                                                    
-                                                        <div>
-                                                            <audio controls>
-                                                                <source src={messageItem?.urlAudio} type="audio/ogg" />
-                                                                <source src={messageItem?.urlAudio} type="audio/mpeg" />
-                                                                Your browser does not support the audio element.
-                                                            </audio>
-                                                        </div>
+                                                    {
+                                                        messageItem?.urlAudio != "fail" ?  (
+                                                            <div>
+                                                                <audio controls>
+                                                                    <source src={messageItem?.urlAudio} type="audio/ogg" />
+                                                                    <source src={messageItem?.urlAudio} type="audio/mpeg" />
+                                                                    Your browser does not support the audio element.
+                                                                </audio>
+                                                            </div>
+                                                        ):(<div></div>)
+                                                    }
+                                                        
                                                    
                                                         <div><span
                                                             className={user.uid === messageItem.uid ? "px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white  text-xl" : "px-4 py-2 rounded-lg inline-block rounded-br-none bg-pink-600 text-white text-xl"}>{messageItem.message} </span>
