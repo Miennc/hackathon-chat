@@ -21,8 +21,7 @@ function Chat(props) {
         if (!message) {
             alert("ghi rồi mới submit bạn êiiii");
             return;
-        }
-        
+        }  
         
         const urls = []
         for (let i = 0;i < file_name.length;i++) {
@@ -31,7 +30,6 @@ function Chat(props) {
                     const fileName = `images/${Date.now()}image.png`;
                     const myRef = ref(storage, fileName);//tao ref
                     await uploadBytes(myRef, file_name[i][j], fileName);
-                    //lưu lại file vào firestore
                     const pathRef = ref(storage, fileName);
                     const url = await getDownloadURL(pathRef);
                     console.log(url);
@@ -41,11 +39,6 @@ function Chat(props) {
                 }
             }
         }
-        // const collectionRefImage = collection(db, 'images');
-
-        // await addDoc(collectionRefImage, {
-        //     url: url
-        // });
         const collectionRef = collection(db, 'chat');
         await addDoc(collectionRef, {
             message: message, uid: user.uid, date: Date.now(), userUid: [user.uid, userId],urls:urls
@@ -107,6 +100,11 @@ function Chat(props) {
         postImg.splice(index, 1)
         setFile_name(postImg);
     };
+
+    const prevImage = (img) =>{
+        console.log(img);
+    }
+
     // const DeleteNote = async (id) => {
     //     const docRef = doc(db, 'chat', id);
     //     await deleteDoc(docRef)
@@ -174,7 +172,7 @@ function Chat(props) {
                                                     {
                                                         messageItem?.urls?.map((img,index) => {
                                                             return(
-                                                                <img src={img} alt="" key={index}/>
+                                                                <img className="cursor-pointer" src={img} alt="" key={index} onClick={()=>prevImage(img)}/>
                                                             )
                                                         })
                                                     }
