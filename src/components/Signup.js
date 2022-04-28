@@ -31,6 +31,7 @@ const Signup = () => {
                     isOnline: false,
                  });
                 alert('Register success')
+                navigate('/login')
             } catch (error) {
                 console.log(error);
                 alert('Registration Failed')

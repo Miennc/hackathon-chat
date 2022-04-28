@@ -37,8 +37,7 @@ const Login = () => {
                 })
                 alert('Login success')
                 sessionStorage.setItem('user',JSON.stringify(resp.user));
-                localStorage.setItem('user', JSON.stringify(resp.user));
-                navigate('/home')
+                navigate('/')
             } catch (e) {
                 alert("Ko đăng nhập đc bạn ei, non")
                 console.error(e);
