@@ -14,8 +14,9 @@ function Home(props) {
             querySnapshot.forEach((doc) => {
                 users.push({
                     ...doc.data(),
-                    id: doc.id
+                    id: doc.id,
                 });
+                setIsOnline(!doc.data().isOnline)
             });
             setUsers(users);
         }
@@ -49,6 +50,11 @@ function Home(props) {
                                         <a href="#" className="title font-medium no-underline">{item.email}</a>
                                     </div>
                                 </div>
+                               { item.isOnline ? 
+                               <div className="online-status text-green-600">Online</div> 
+                               : <div className="online-status text-red-600">Offline</div>
+
+                               }
                                 <div className="user-option mx-auto sm:ml-auto sm:mr-0">
                                     <button className="btn inline-block select-none no-underline align-middle cursor-pointer whitespace-nowrap px-4 py-1.5 rounded text-base font-medium leading-6 tracking-tight text-white text-center border-0 bg-[#6911e7] hover:bg-[#590acb] duration-300" type="button">
                                         <Link to={`/chat?email=${item.email}&id=${item.userId}`}>chat</Link>
@@ -56,7 +62,7 @@ function Home(props) {
                                 </div>
                             </div>
                         )
-                    })}
+                    })} 
 
                     <a className="show-more block w-10/12 mx-auto py-2.5 px-4 text-center no-underline rounded hover:bg-[#f6f8f9] font-medium duration-300" href="#/">Show more members</a>
                 </div>
