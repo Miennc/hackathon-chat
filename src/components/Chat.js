@@ -15,6 +15,7 @@ function Chat(props) {
     const [files,setFiles] = useState([]);
     const [showModal,setShowModal] = useState(false);
     const [previewImage,setPreviewImage] = useState('')
+    const [audio,setAudio] = useState(null)
     let unSub = null;
 
     const postMessage = async (e) => {
@@ -42,10 +43,31 @@ function Chat(props) {
                 }
             }
         }
+
+        
+        const urlAudio = []
+        try {
+            const fileName = `audios/${Date.now()}audio.mp4`;
+            const myRef = ref(storage, fileName);//tao ref
+            await uploadBytes(myRef, audio, fileName);
+            //lưu lại file vào firestore
+            const pathRef = ref(storage, fileName);
+            const url = await getDownloadURL(pathRef);
+            urlAudio.push(url);
+        } catch (e) {
+            alert("lỗi")
+        }
+
         const collectionRef = collection(db, 'chat');
         await addDoc(collectionRef, {
-            message: message, uid: user.uid, date: new Date(), userUid: [user.uid, userId],urls:urls
-        });    
+            message: message, 
+            uid: user.uid, 
+            date: new Date(), 
+            userUid: [user.uid, userId],
+            urls:urls,
+            urlAudio:urlAudio[0],
+        });
+        document.getElementById('messages').scrollTo(0, 1000000);
         setMessage('');
         setFile_name([]);
         setSelectedImage([]);
@@ -55,7 +77,7 @@ function Chat(props) {
 
         (async () => {
             const collectionRef = collection(db, 'chat');
-            const collectionQuery = query(collectionRef, where('userUid', 'in', [[userId, user.uid], [user.uid, userId]]),limit(7));
+            const collectionQuery = query(collectionRef, where('userUid', 'in', [[userId, user.uid], [user.uid, userId]]));
             unSub = onSnapshot(collectionQuery, (snapShot) => {
                 const localMessage = [];
                 snapShot.forEach(doc => {
@@ -64,13 +86,15 @@ function Chat(props) {
                         message: doc.data().message,
                         uid: doc.data().uid,
                         date: doc.data().date,
-                        urls: doc.data().urls
+                        urls: doc.data().urls,
+                        urlAudio:doc.data().urlAudio
                     });
                 });
                 setDataMessage(localMessage);
             });
+            
         })();
-
+        document.getElementById('messages').scrollTo(0, 1000000);
     }, []);
 
     const imageChange = (e) => {
@@ -106,6 +130,10 @@ function Chat(props) {
     const prevImage = (img) =>{
         setPreviewImage(img);
         setShowModal(true);
+    }
+
+    const audioChange = (e) =>{
+        setAudio(e.target.files[0]);
     }
 
     // const DeleteNote = async (id) => {
@@ -185,6 +213,15 @@ function Chat(props) {
                                                             )
                                                         })
                                                     }
+                                                    
+                                                        <div>
+                                                            <audio controls>
+                                                                <source src={messageItem?.urlAudio} type="audio/ogg" />
+                                                                <source src={messageItem?.urlAudio} type="audio/mpeg" />
+                                                                Your browser does not support the audio element.
+                                                            </audio>
+                                                        </div>
+                                                   
                                                         <div><span
                                                             className={user.uid === messageItem.uid ? "px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white  text-xl" : "px-4 py-2 rounded-lg inline-block rounded-br-none bg-pink-600 text-white text-xl"}>{messageItem.message} </span>
                                                      
@@ -202,6 +239,7 @@ function Chat(props) {
                                     )
                                 })
                             }
+                            
                         </div>
                       
                      <form onSubmit={postMessage}>
@@ -225,9 +263,21 @@ function Chat(props) {
                                     className="inline-flex hidden items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
                             />
                         </label>
+                        <label for="mic" className="absolute inset-y-0 flex items-center">
+                            <input type="file" id="mic" onChange={audioChange} accept="audio/*"
+                                    className="hidden inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    className="h-6 w-6 text-gray-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                        </label>
                          <input type="text" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Aa"  className="border-2 border-green-400 w-96 p-2"/>
+                      
                       </div>
                      </form>
+                     
                 </div>
             </div>
         </div>
