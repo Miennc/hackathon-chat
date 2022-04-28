@@ -30,6 +30,7 @@ const Signup = () => {
                     userId: response.user.uid,
                  });
                 alert('Register success')
+                navigate("/")
             } catch (error) {
                 console.log(error);
                 alert('Registration Failed')

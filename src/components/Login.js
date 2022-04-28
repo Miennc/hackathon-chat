@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../firebase";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
@@ -75,8 +75,9 @@ const Login = () => {
                                     </form>
                                     <div className="text-center mt-4">
                                         <a className="no-underline hover:underline text-blue-dark text-xs" href="{{ route('password.request') }}">
-                                            Forgot Your Password?
+                                            Forgot Your Password? 
                                         </a>
+                                        <Link to="/signup" >Đăng ký</Link>
                                     </div>
                                 </div>
                             </div>
