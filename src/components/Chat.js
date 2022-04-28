@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { db } from "../firebase";
 import { useSearchParams } from 'react-router-dom';
 import {getStorage, uploadBytes, ref, getDownloadURL} from "firebase/storage";
-import { collection, getDocs, deleteDoc, doc, onSnapshot, getDoc, query, where, addDoc, orderBy, limit,} from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, onSnapshot, getDoc, query, where, addDoc, orderBy, limit, Firestore,} from 'firebase/firestore';
+
+
 function Chat(props) {
     const [message, setMessage] = useState('');
     const [searchParams] = useSearchParams();
@@ -13,7 +15,6 @@ function Chat(props) {
     const [selectedImages, setSelectedImage] = useState([]);
     const [file_name, setFile_name] = useState([]);
     let unSub = null;
-
     const postMessage = async (e) => {
         e.preventDefault();
         const storage = getStorage();//base storage //unix
@@ -22,6 +23,7 @@ function Chat(props) {
             return;
         }
         const collectionRef = collection(db, 'chat');
+
         await addDoc(collectionRef, {
             message: message, uid: user.uid, date: Date.now(), userUid: [user.uid, userId]
         });
@@ -60,8 +62,6 @@ function Chat(props) {
                 setDataMessage(localMessage);
             });
         })();
-
-
     }, []);
 
     const imageChange = (e) => {

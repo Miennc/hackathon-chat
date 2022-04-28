@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import { Link } from "react-router-dom";
 function Home(props) {
     const [users,setUsers] = useState([])
+    const [isOnline, setIsOnline] = useState(false)
     useEffect(()=>{
         const collectionRef = collection(db, 'users');
 
@@ -15,6 +16,7 @@ function Home(props) {
                     ...doc.data(),
                     id: doc.id
                 });
+                setIsOnline(!doc.data().isOnline)
             });
             setUsers(users);
         }
@@ -45,6 +47,7 @@ function Home(props) {
                                         <a href="#" className="title font-medium no-underline">{item.email}</a>
                                     </div>
                                 </div>
+                                <span>{item.isOnline ? 'onlinne' : 'offline'}</span>
                                 <div className="user-option mx-auto sm:ml-auto sm:mr-0">
                                     <button className="btn inline-block select-none no-underline align-middle cursor-pointer whitespace-nowrap px-4 py-1.5 rounded text-base font-medium leading-6 tracking-tight text-white text-center border-0 bg-[#6911e7] hover:bg-[#590acb] duration-300" type="button">
                                         <Link to={`/chat?email=${item.email}&id=${item.userId}`}>chat</Link>
