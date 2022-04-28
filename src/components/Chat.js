@@ -45,6 +45,8 @@ function Chat(props) {
             message: message, uid: user.uid, date: new Date(), userUid: [user.uid, userId],urls:urls
         });    
         setMessage('');
+        setFile_name([]);
+        setSelectedImage([]);
     }
 
     useEffect(() => {
