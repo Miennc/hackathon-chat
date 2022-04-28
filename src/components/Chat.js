@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { db } from "../firebase";
 import { useSearchParams } from 'react-router-dom';
-import { collection, getDocs, deleteDoc, doc, onSnapshot, getDoc, query, where, addDoc, orderBy, limit, } from 'firebase/firestore';
+import {getStorage, uploadBytes, ref, getDownloadURL} from "firebase/storage";
+import { collection, getDocs, deleteDoc, doc, onSnapshot, getDoc, query, where, addDoc,orderBy, limit,} from 'firebase/firestore';
 function Chat(props) {
     const [message, setMessage] = useState('');
     const [searchParams] = useSearchParams();
@@ -9,26 +10,42 @@ function Chat(props) {
     const [user, setUser] = useState(JSON.parse(sessionStorage.getItem("user")));
     const [userEmail, setUserEmail] = useState(searchParams.get('email'));
     const [userId, setUserId] = useState(searchParams.get('id'));
+    const [selectedImages, setSelectedImage] = useState([]);
+    const [file_name, setFile_name] = useState([]);
+    const [idIncrement, setIdIncrement] = useState(0);
     let unSub = null;
 
     const postMessage = async (e) => {
+
         e.preventDefault();
+        setIdIncrement(idIncrement + 1);
+        const storage = getStorage();//base storage //unix
         if (!message) {
             alert("ghi rồi mới submit bạn êiiii");
             return;
         }
         const collectionRef = collection(db, 'chat');
         await addDoc(collectionRef, {
-            message: message, uid: user.uid, date: Date.now(), userUid: [user.uid, userId]
+            message: message, uid: user.uid, idIncrement: idIncrement, userUid: [user.uid, userId]
+        });
+        const fileName = `images/${Date.now()}image.png`;
+        const myRef = ref(storage, fileName);//tao ref
+        await uploadBytes(myRef, file_name, fileName);
+        //lưu lại file vào firestore
+        const collectionRefImage = collection(db, 'images');
+        const pathRef = ref(storage, fileName);
+        const url = await getDownloadURL(pathRef);
+        await addDoc(collectionRefImage, {
+            url: url
         });
         setMessage('');
     }
 
     useEffect(() => {
+
         (async () => {
             const collectionRef = collection(db, 'chat');
             const collectionQuery = query(collectionRef, where('userUid', 'in', [[userId, user.uid], [user.uid, userId]]));
-
             unSub = onSnapshot(collectionQuery, (snapShot) => {
                 const localMessage = [];
                 snapShot.forEach(doc => {
@@ -36,20 +53,53 @@ function Chat(props) {
                         id: doc.id,
                         message: doc.data().message,
                         uid: doc.data().uid,
-                        date: doc.data().date
+                        idIncrement: doc.data().idIncrement,
+                        url: doc.data().url
                     });
                 });
                 setDataMessage(localMessage);
             });
         })();
+      
+    }, [idIncrement]);
 
+    const imageChange = (e) => {
+        // if (e.target.files) {
+        //     const fileArray = Array.from(e.target.files).map((file) => URL.createObjectURL(file))
+        //     setSelectedImage((prevImages) => prevImages.concat(fileArray));
+        //     const file_names = Array.from(e.target.files).map((file) => (file))
+        //     setFile_name(file_name => [...file_name, file_names]);
+        //     Array.from(e.target.files).map(
+        //         (file) => URL.revokeObjectURL(file)
+        //     )
+        // }
+        setFile_name(e.target.files[0]);
+    };
 
-    }, []);
+    const renderPhotos = (source) => {
+        return source.map((photo, index) => {
+            return (<div className="w-40 h-40 relative" key={index}>
+                <img className="w-40 h-40 object-cover shadow" type="img" src={photo} key={photo} />
+                <i className="w-6 h-6 absolute z-10 top-2 left-32 rounded-full text-center flex items-center justify-center cursor-pointer opacity-30 hover:opacity-100 hover:bg-gray-200 bg-gray-300 text-2xl" onClick={removeSelectedImage.bind(this, index)}><ion-icon name="close-outline"></ion-icon></i>
+            </div>)
+        })
+    };
 
-    // const deleteNote = async (id) => {
-    //     const docRef = doc(db, 'chat', id);
-    //     await deleteDoc(docRef)
-    // }
+    const removeSelectedImage = (index) => {
+        const arr = [...selectedImages];
+        const postImg = [...file_name];
+        arr.splice(index, 1);
+        setSelectedImage(arr);
+        postImg.splice(index, 1)
+        setFile_name(postImg);
+    };
+
+// console.log(file_name);
+// console.log(selectedImages);
+//     // const DeleteNote = async (id) => {
+//     //     const docRef = doc(db, 'chat', id);
+//     //     await deleteDoc(docRef)
+//     // }
     return (
         <div>
             <div className=" bg-green-300">
@@ -104,7 +154,7 @@ function Chat(props) {
                         <div id="messages"
                             className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch">
                             {
-                                dataMessage?.map((messageItem, messageIndex) => {
+                                dataMessage?.sort((a,b)=>a.idIncrement - b.idIncrement)?.map((messageItem, messageIndex) => {
                                     return (
                                         <div>
                                             <div className="chat-message">
@@ -112,6 +162,10 @@ function Chat(props) {
                                                     <div className={user.uid === messageItem.uid ? "flex flex-col space-y-2 text-xs order-1 max-w-xs mx-2 items-end" : "flex flex-col space-y-2 text-xs order-2 max-w-xs mx-2 items-end"}>
                                                         <div><span
                                                             className={user.uid === messageItem.uid ? "px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white  text-xl" : "px-4 py-2 rounded-lg inline-block rounded-br-none bg-pink-600 text-white text-xl"}>{messageItem.message} </span>
+                                                     
+                                                        </div>
+                                                        <div>{messageItem.idIncrement}</div>
+                                                        <div>
                                                         </div>
                                                     </div>
                                                     <img
@@ -123,19 +177,38 @@ function Chat(props) {
                                     )
                                 })
                             }
-
-
                         </div>
-
-                        <form onSubmit={postMessage}>
-                            <input type="file" />
-                            <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Aa" className="border-2 border-green-400 w-96 p-2" />
-                        </form>
-                    </div>
+                      
+                     <form onSubmit={postMessage}>
+                         <div>
+                            {selectedImages && (
+                                <div className="w-max space-x-4 flex">
+                                    {renderPhotos(selectedImages)}
+                                </div>
+                            )}
+                         </div>
+                      <div className="flex items-center">
+                      <label for="fileImg" className=" cursor-pointer mx-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" className="h-6 w-6 text-gray-600">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <input type="file" id="fileImg" onChange={imageChange} accept="image/*"
+                                    className="inline-flex hidden items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
+                            />
+                        </label>
+                         <input type="text" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Aa"  className="border-2 border-green-400 w-96 p-2"/>
+                      </div>
+                     </form>
                 </div>
             </div>
         </div >
+    </div>
     );
+
 }
 
 export default Chat;

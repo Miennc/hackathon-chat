@@ -13,6 +13,12 @@ const firebaseConfig = {
     storageBucket: "fir-cy-9efeb.appspot.com",
     messagingSenderId: "509614607981",
     appId: "1:509614607981:web:2558e8d00a3dace1353964"
+    // apiKey: "AIzaSyCEgWrmKEUwvTVJwmxwZQ3YdVTYlhe8odw",
+    // authDomain: "fir-cy-65da6.firebaseapp.com",
+    // projectId: "fir-cy-65da6",
+    // storageBucket: "fir-cy-65da6.appspot.com",
+    // messagingSenderId: "996211122150",
+    // appId: "1:996211122150:web:1ae6e9fb55ba2832398027"
 };
 
 // Initialize Firebase
