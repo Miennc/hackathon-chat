@@ -142,7 +142,7 @@ function Chat(props) {
     // }
     return (
         <div>
-            <div className=" bg-green-300">
+            <div className=" bg-slate-200">
                 <div className="w-10/12 bg-white mx-auto">
                     <div className="flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen">
                         <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
@@ -159,7 +159,7 @@ function Chat(props) {
                                 </div>
                                 <div className="flex flex-col leading-tight">
                                     <div className="text-2xl mt-1 flex items-center">
-                                        <span className="text-gray-700 mr-3">{userEmail}</span>
+<span className="text-gray-700 mr-3">{userEmail}</span>
                                     </div>
                                     <span className="text-lg text-gray-600">Junior Developer</span>
                                 </div>
@@ -192,7 +192,7 @@ function Chat(props) {
                             </div>
                         </div>
                         <div className={showModal ? "relative w-100vw h-100vh bg-gray-500" : "hidden"}>
-                            <div className="w-100vw top-0 left-0 ">
+                        <div className="w-100vw top-0 left-0 ">
                                 <img className="w-auto object-cover mx-auto" src={previewImage} alt=""  />
                                 <span className="absolute right-3 top-0 text-2xl cursor-pointer" onClick={()=>{setShowModal(!showModal)}}>x</span>
                             </div>
@@ -275,6 +275,7 @@ function Chat(props) {
                         </label>
                          <input type="text" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Aa"  className="border-2 border-green-400 w-96 p-2"/>
                       
+
                       </div>
                      </form>
                      
