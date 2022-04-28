@@ -1,21 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import { getAuth, signInWithCustomToken ,onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs,updateDoc, deleteDoc, doc, onSnapshot, addDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs,updateDoc, deleteDoc, doc, onSnapshot, addDoc, query, where, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from "../firebase";
 import { Link } from "react-router-dom";
+import {useNavigate} from 'react-router-dom'
 function Home(props) {
     const [users,setUsers] = useState([])
     const [isOnline, setIsOnline] = useState(false)
-    const onlineUser = async () => {
-        const data = users.filter(user => user.isOnline)
-        console.log("on",data)
-        await updateDoc(db, 'users', data[0]?.id, {isOnline: true})
-    }
-    const offlineUser = async () => {
-        const data = users.filter(user => !user.isOnline)
-        console.log("off",data)
-        await updateDoc(db, 'users', data[0]?.id, {isOnline: true})
-    }
+    let navigate = useNavigate();
+    
     useEffect(()=>{
         const collectionRef = collection(db, 'users');
 
@@ -43,7 +36,7 @@ function Home(props) {
                     <span className="night hidden" >👀</span>
                 </h1>
                 <div className="mb-4">
-                    <button className="toggle-theme btn inline-block select-none no-underline align-middle cursor-pointer whitespace-nowrap px-4 py-1.5 rounded text-base font-medium leading-6 tracking-tight text-white text-center border-0 bg-[#6911e7] hover:bg-[#590acb] duration-300" type="button">Dark</button>
+                    <button className="toggle-theme btn inline-block select-none no-underline align-middle cursor-pointer whitespace-nowrap px-4 py-1.5 rounded text-base font-medium leading-6 tracking-tight text-white text-center border-0 bg-[#6911e7] hover:bg-[#590acb] duration-300" type="button" >Logout</button>
                 </div>
                 <div className='user-list w-full max-w-lg mx-auto bg-white rounded-xl shadow-xl flex flex-col py-4'>
                     {users?.map((item,index)=>{
