@@ -272,7 +272,7 @@ function Chat(props) {
                                     className="inline-flex hidden items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
                             />
                         </label>
-                        <label for="mic" className="absolute inset-y-0 flex items-center">
+                        <label for="mic" className="relative inset-y-0 ">
                             <input type="file" id="mic" onChange={audioChange} accept="audio/*"
                                     className="hidden inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"/>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
