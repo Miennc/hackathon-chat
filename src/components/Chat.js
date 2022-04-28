@@ -12,7 +12,9 @@ function Chat(props) {
     const [userId, setUserId] = useState(searchParams.get('id'));
     const [selectedImages, setSelectedImage] = useState([]);
     const [file_name, setFile_name] = useState([]);
-    const [files,setFiles] = useState([])
+    const [files,setFiles] = useState([]);
+    const [showModal,setShowModal] = useState(false);
+    const [previewImage,setPreviewImage] = useState('')
     let unSub = null;
 
     const postMessage = async (e) => {
@@ -87,7 +89,7 @@ function Chat(props) {
         return source.map((photo, index) => {
             return (<div className="w-40 h-40 relative" key={index}>
                 <img className="w-40 h-40 object-cover shadow" type="img" src={photo} key={photo} />
-                <i className="w-6 h-6 absolute z-10 top-2 left-32 rounded-full text-center flex items-center justify-center cursor-pointer opacity-30 hover:opacity-100 hover:bg-gray-200 bg-gray-300 text-2xl" onClick={removeSelectedImage.bind(this, index)}><ion-icon name="close-outline"></ion-icon></i>
+                <i className="w-6 h-6 absolute z-10 top-2 left-32 rounded-full text-center flex items-center justify-center cursor-pointer opacity-30 hover:opacity-100 hover:bg-gray-200 bg-gray-300 text-2xl" onClick={removeSelectedImage.bind(this, index)}>x<ion-icon name="close-outline"></ion-icon></i>
             </div>)
         })
     };
@@ -102,7 +104,8 @@ function Chat(props) {
     };
 
     const prevImage = (img) =>{
-        console.log(img);
+        setPreviewImage(img);
+        setShowModal(true);
     }
 
     // const DeleteNote = async (id) => {
@@ -158,6 +161,12 @@ function Chat(props) {
                                             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                                     </svg>
                                 </button>
+                            </div>
+                        </div>
+                        <div className={showModal ? "relative w-100vw h-100vh bg-gray-500" : "hidden"}>
+                            <div className="w-100vw top-0 left-0 ">
+                                <img className="w-auto object-cover mx-auto" src={previewImage} alt=""  />
+                                <span className="absolute right-3 top-0 text-2xl cursor-pointer" onClick={()=>{setShowModal(!showModal)}}>x</span>
                             </div>
                         </div>
                         <div id="messages"
