@@ -25,11 +25,6 @@ const Signup = () => {
                 const response = await createUserWithEmailAndPassword(auth, email, password);
                 const collectionRef = collection(db, 'users');
                 console.log(response.user.email);
-                await addDoc(collectionRef, {
-                    email: response.user.email,
-                    userId: response.user.uid,
-                    isOnline: false,
-                 });
                 alert('Register success')
                 navigate('/login')
             } catch (error) {

@@ -29,7 +29,20 @@ function Home(props) {
             navigate('/login')
         }
     }, [])
-
+    const _doLogout = async (evt) => {
+        evt.preventDefault();
+        try {
+            await updateDoc(doc(db, `users/${auth.currentUser.uid}`), {
+                isOnline: false
+            })
+             auth.signOut();
+            sessionStorage.removeItem('user');
+            localStorage.removeItem('user');
+            navigate('/login')
+        } catch (e) {
+            console.error(e);
+        }
+    }
     return (
         <div>
             <div className='flex flex-col items-center justify-center min-h-screen p-16 bg-slate-200'>
@@ -39,7 +52,7 @@ function Home(props) {
                     <span className="night hidden" >👀</span>
                 </h1>
                 <div className="mb-4">
-                    <button className="toggle-theme btn inline-block select-none no-underline align-middle cursor-pointer whitespace-nowrap px-4 py-1.5 rounded text-base font-medium leading-6 tracking-tight text-white text-center border-0 bg-[#6911e7] hover:bg-[#590acb] duration-300" type="button" >Logout</button>
+                    <button className="toggle-theme btn inline-block select-none no-underline align-middle cursor-pointer whitespace-nowrap px-4 py-1.5 rounded text-base font-medium leading-6 tracking-tight text-white text-center border-0 bg-[#6911e7] hover:bg-[#590acb] duration-300" type="button" onClick={_doLogout}>Logout</button>
                 </div>
                 <div className='user-list w-full max-w-lg mx-auto bg-white rounded-xl shadow-xl flex flex-col py-4'>
                     {users?.map((item, index) => {
