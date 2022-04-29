@@ -43,7 +43,6 @@ function Chat(props) {
                 }
             }
         }
-
         
         const urlAudio = []
         if(audio){
