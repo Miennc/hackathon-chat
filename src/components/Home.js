@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, {useEffect, useState} from 'react';
 import { getAuth, signInWithCustomToken ,onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs,updateDoc, deleteDoc, doc, onSnapshot, addDoc, query, where, setDoc, getDoc } from 'firebase/firestore';
@@ -11,17 +10,6 @@ function Home(props) {
     let navigate = useNavigate();
     
     useEffect(()=>{
-=======
-import React, { useEffect, useState } from 'react';
-import { getAuth, signInWithCustomToken, onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, deleteDoc, doc, onSnapshot, addDoc, query, where } from 'firebase/firestore';
-import { db } from "../firebase";
-import { Link, useNavigate } from "react-router-dom";
-function Home(props) {
-    const [users, setUsers] = useState([])
-    let navigate = useNavigate();
-    useEffect(() => {
->>>>>>> 20134d2cd518a2c93ba55664a5e9e65cd340d87a
         const collectionRef = collection(db, 'users');
 
         onSnapshot(collectionRef, (querySnapshot) => {
